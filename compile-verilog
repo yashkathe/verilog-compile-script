@@ -1,0 +1,30 @@
+#!/bin/bash
+
+which iverilog
+if [ $? -ne 0 ]; then
+    echo "Error: Icarus Verilog (iverilog) is not installed!"
+    echo "install it using: sudo apt install iverilog (for Ubuntu/Debian)"
+    exit 1
+fi
+
+if [ $# -eq 0 ]; then
+    echo "Error: No Verilog file provided!"
+    echo "Usage: ./run_verilog.sh <verilog_file.v>"
+    exit 1
+fi
+
+# Extract filename without extension
+FILENAME=$(basename -- "$1")
+MODULE="${FILENAME%.*}"
+
+# Check if file exists
+if [ ! -f "$1" ]; then
+    echo "❌ Error: File '$1' not found!"
+    exit 1
+fi
+
+# Compile Verilog file with Icarus Verilog
+iverilog -o "${MODULE}_sim" "$1"
+
+# Run the compiled simulation
+vvp "${MODULE}_sim"
